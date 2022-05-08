@@ -4,6 +4,7 @@ from discord.ext.commands import has_permissions, MissingPermissions, BadArgumen
 from discord.ui import Button, View
 
 import json
+import aiosqlite
 import re
 import os
 
@@ -11,6 +12,7 @@ from keep_alive import keep_alive
 
 intents = discord.Intents.default()
 intents.message_content=True
+intents.members=True
 
 bot = discord.Bot(intents=intents)
 
@@ -24,6 +26,9 @@ servers = config['servers']
 async def on_ready():
     print("ready")
     print(servers)
+    async with aiosqlite.connect("main.db") as db:
+        async with db.cursor() as cursor:
+            await cursor.execute('CREATE TABLE IF NOT EXTSTS users (')
 
 @bot.slash_command(
     name="banword",
@@ -181,6 +186,7 @@ async def sub(ctx):
     view.add_item(vay)
 
     await ctx.respond(embed=embed,view=view)
+
 
 
 keep_alive()
